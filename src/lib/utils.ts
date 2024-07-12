@@ -74,25 +74,25 @@ export const scatterMines = (rows: Cell[][], mines: number) => {
   return copyRows;
 };
 
-export const scatterTraps = (rows: Cell[][], traps: number) => {
-  const copyRows = [...rows];
-  let allowedSpaces = copyRows.map((row) =>
-    row.map((c, i) =>
-      c.isClicked || c.isMine || c.neighbors === 0 ? null : i,
-    ),
-  );
+// export const scatterTraps = (rows: Cell[][], traps: number) => {
+//   const copyRows = [...rows];
+//   let allowedSpaces = copyRows.map((row) =>
+//     row.map((c, i) =>
+//       c.isClicked || c.isMine || c.neighbors === 0 ? null : i,
+//     ),
+//   );
 
-  for (let i = 0; i < traps; i++) {
-    const row = getRandNotInArr(0, rows.length - 1, []);
-    // const cell = getRandNotInArr(0, rows[row].length - 1, placedIndexes[row]);
-    // TODO not working
-    const cell = pickNumberInArr(allowedSpaces[row]);
-    allowedSpaces[row] = allowedSpaces[row].filter((n) => n !== cell);
-    copyRows[row][cell].isTrap = true;
-  }
+//   for (let i = 0; i < traps; i++) {
+//     const row = getRandNotInArr(0, rows.length - 1, []);
+//     // const cell = getRandNotInArr(0, rows[row].length - 1, placedIndexes[row]);
+//     // TODO not working
+//     const cell = pickNumberInArr(allowedSpaces[row]);
+//     allowedSpaces[row] = allowedSpaces[row].filter((n) => n !== cell);
+//     copyRows[row][cell].isTrap = true;
+//   }
 
-  return copyRows;
-};
+//   return copyRows;
+// };
 
 export const calculateNeighbors = (rows: Cell[][]) => {
   const copyRows = [...rows];
