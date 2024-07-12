@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Flag, Bomb } from "lucide-react";
+import { Flag } from "lucide-react";
 import { Eight } from "../Numbers/Eight";
 import { Five } from "../Numbers/Five";
 import { Four } from "../Numbers/Four";
@@ -11,13 +11,7 @@ import { Two } from "../Numbers/Two";
 import { useRef, useState } from "react";
 import { Cell, gameHeight, gameWidth, Settings } from "@/App";
 import { ZoomSlider } from "../ZoomSlider";
-import {
-  calculateNeighbors,
-  clickZeroCells,
-  getRandNotInArr,
-  scatterMines,
-} from "@/lib/utils";
-import { Button } from "../ui/button";
+import { clickZeroCells } from "@/lib/utils";
 import { Mine } from "../Mine";
 
 export const Board = ({
