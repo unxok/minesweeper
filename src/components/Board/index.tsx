@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Flag, Bomb } from "lucide-react";
 import { Eight } from "../Numbers/Eight";
 import { Five } from "../Numbers/Five";
@@ -11,7 +11,8 @@ import { Two } from "../Numbers/Two";
 import { useRef, useState } from "react";
 import { Cell, gameHeight, gameWidth, Settings } from "@/App";
 import { ZoomSlider } from "../ZoomSlider";
-import { clickZeroCells } from "@/lib/utils";
+import { calculateNeighbors, clickZeroCells, scatterMines } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 export const Board = ({
   rows,
@@ -42,7 +43,7 @@ export const Board = ({
         }}
         onPanEnd={() => setIsPanning(false)}
         ref={boardRef}
-        className="flex touch-none flex-wrap items-center justify-center"
+        className="flex touch-none flex-wrap items-center justify-center bg-background"
         style={{
           width: gameWidth,
           height: gameHeight,
@@ -59,7 +60,7 @@ export const Board = ({
             {row.map((cell, cellIndex) => (
               <span
                 key={rowIndex + cellIndex + "cell"}
-                className={`flex items-center justify-center border transition-colors hover:bg-secondary/50 ${cell.isClicked ? "bg-secondary" : "bg-background"} ${cell.isFlagged && "border-2 border-destructive"} ${cell.isClicked ? "cursor-default" : "cursor-pointer"}`}
+                className={`flex items-center justify-center border transition-colors hover:bg-secondary/50 ${cell.isClicked ? "bg-secondary" : "bg-background"} ${(cell.isFlagged || cell.isTrap) && "border-2 border-destructive"} ${cell.isTrap && "border-dashed"} ${cell.isClicked ? "cursor-default" : "cursor-pointer"}`}
                 style={{
                   width: gameWidth / settings.size[0],
                   height: gameHeight / settings.size[1],
@@ -87,7 +88,7 @@ export const Board = ({
                 }}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  if (cell.isClicked && !cell.isFlagged) return;
+                  if ((cell.isClicked && !cell.isFlagged) || isGameOver) return;
                   setRemainingFlags((prev) => {
                     if (cell.isFlagged) {
                       // flag removed
@@ -106,9 +107,19 @@ export const Board = ({
                   });
                 }}
               >
-                {cell.isFlagged && (
-                  <Flag size={"80%"} className="text-destructive" />
-                )}
+                <AnimatePresence>
+                  {cell.isFlagged && (
+                    <motion.div
+                      className="flex items-center justify-center"
+                      // key={cellIndex + "flag"}
+                      initial={{ translateY: -50, opacity: 0 }}
+                      animate={{ translateY: 0, rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 180, opacity: 0 }}
+                    >
+                      <Flag size={"80%"} className="text-destructive" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 {cell.isClicked && (
                   <span
                     onDragStart={(e) => e.preventDefault()}
@@ -142,6 +153,19 @@ export const Board = ({
           </div>
         ))}
       </motion.div>
+      {/* <Button
+        onClick={() => {
+          setRows((prev) => {
+            const noMines = prev.map((row) =>
+              row.map((c) => ({ ...c, isMine: false }) as Cell),
+            );
+            const withMines = scatterMines(noMines, settings.mines);
+            return calculateNeighbors(withMines);
+          });
+        }}
+      >
+        randomize
+      </Button> */}
       <ZoomSlider boardRef={boardRef} />
     </>
   );

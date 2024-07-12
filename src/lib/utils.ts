@@ -42,16 +42,53 @@ export const getRandNotInArr: (
   return num;
 };
 
+export const pickNumberInArr = (arr: (number | null)[]) => {
+  const indexes = arr
+    .map((n, i) => (n === null ? null : i))
+    .filter((n) => n !== null);
+  const index = getRandNotInArr(0, indexes.length - 1, []);
+  return arr[index] as number;
+};
+
+export const pickIndexInArr = (arr: (any | null)[]) => {
+  const indexes = arr
+    .map((n, i) => (n === null ? null : i))
+    .filter((n) => n !== null);
+  return getRandNotInArr(0, indexes.length - 1, []);
+};
+
 export const scatterMines = (rows: Cell[][], mines: number) => {
   const copyRows = [...rows];
-  const placedIndexes: number[][] = [];
-  rows.forEach((_, i) => (placedIndexes[i] = []));
+  let allowedSpaces = copyRows.map((row) =>
+    row.map((c, i) => (c.isClicked ? null : i)),
+  );
 
   for (let i = 0; i < mines; i++) {
     const row = getRandNotInArr(0, rows.length - 1, []);
-    const cell = getRandNotInArr(0, rows[row].length - 1, placedIndexes[row]);
-    placedIndexes[row].push(cell);
+    // const cell = getRandNotInArr(0, rows[row].length - 1, placedIndexes[row]);
+    const cell = pickNumberInArr(allowedSpaces[row]);
+    allowedSpaces[row] = allowedSpaces[row].filter((n) => n !== cell);
     copyRows[row][cell].isMine = true;
+  }
+
+  return copyRows;
+};
+
+export const scatterTraps = (rows: Cell[][], traps: number) => {
+  const copyRows = [...rows];
+  let allowedSpaces = copyRows.map((row) =>
+    row.map((c, i) =>
+      c.isClicked || c.isMine || c.neighbors === 0 ? null : i,
+    ),
+  );
+
+  for (let i = 0; i < traps; i++) {
+    const row = getRandNotInArr(0, rows.length - 1, []);
+    // const cell = getRandNotInArr(0, rows[row].length - 1, placedIndexes[row]);
+    // TODO not working
+    const cell = pickNumberInArr(allowedSpaces[row]);
+    allowedSpaces[row] = allowedSpaces[row].filter((n) => n !== cell);
+    copyRows[row][cell].isTrap = true;
   }
 
   return copyRows;
@@ -187,6 +224,10 @@ export const registerHighScore = (difficulty: string, score: number) => {
   } catch (_) {
     // if invalid then I don't care
   }
-  currentScores[difficulty] = Math.max(currentScores[difficulty], score);
+  if (currentScores[difficulty] > 0) {
+    currentScores[difficulty] = Math.min(currentScores[difficulty], score);
+  } else {
+    currentScores[difficulty] = score;
+  }
   localStorage.setItem(HIGH_SCORES_LS_KEY, JSON.stringify(currentScores));
 };

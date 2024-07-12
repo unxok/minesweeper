@@ -7,6 +7,7 @@ import {
   scatterMines,
   initRows,
   registerHighScore,
+  scatterTraps,
 } from "./lib/utils";
 
 export type Cell = {
@@ -14,6 +15,7 @@ export type Cell = {
   neighbors: number;
   isFlagged: boolean;
   isClicked: boolean;
+  isTrap: boolean;
 };
 
 export const defaultCell: Cell = {
@@ -21,12 +23,14 @@ export const defaultCell: Cell = {
   neighbors: 0,
   isFlagged: false,
   isClicked: false,
+  isTrap: false,
 };
 
 export type Settings = {
   difficulty: string;
   size: [w: number, h: number];
   mines: number;
+  traps?: boolean;
 };
 
 export const settingsChoices: Settings[] = [
@@ -36,7 +40,7 @@ export const settingsChoices: Settings[] = [
   { difficulty: "medium", size: [13, 15], mines: 40 },
   { difficulty: "medium+", size: [15, 15], mines: 40 },
   { difficulty: "medium++", size: [16, 16], mines: 40 },
-  { difficulty: "expert", size: [16, 30], mines: 99 },
+  { difficulty: "expert", size: [16, 30], mines: 99, traps: true },
   { difficulty: "IMPOSSIBLE", size: [30, 30], mines: 200 },
 ];
 
@@ -63,11 +67,14 @@ function App() {
   const [isWinner, setIsWinner] = useState(false);
 
   useEffect(() => {
-    setRows(() =>
-      calculateNeighbors(
+    setRows(() => {
+      const newRows = calculateNeighbors(
         scatterMines(initRows(settings.size[1]), settings.mines),
-      ),
-    );
+      );
+      return newRows;
+      // if (!settings.traps) return newRows;
+      // return scatterTraps(newRows, settings.mines);
+    });
     setRemainingFlags(settingsChoices[selectedSettings].mines);
     setIsGameOver(false);
   }, [selectedSettings]);
