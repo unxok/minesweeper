@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Flag } from "lucide-react";
+import { Flag, Shovel } from "lucide-react";
 import { Eight } from "../Numbers/Eight";
 import { Five } from "../Numbers/Five";
 import { Four } from "../Numbers/Four";
@@ -13,6 +13,7 @@ import { Cell, gameHeight, gameWidth, Settings } from "@/App";
 import { ZoomSlider } from "../ZoomSlider";
 import { clickZeroCells } from "@/lib/utils";
 import { Mine } from "../Mine";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Board = ({
   rows,
@@ -31,9 +32,38 @@ export const Board = ({
   timerRef: React.MutableRefObject<number>;
   setRemainingFlags: React.Dispatch<React.SetStateAction<number>>;
 }) => {
+  const [clickIsFlag, setClickIsFlag] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [boardPan, setBoardPan] = useState<[x: number, y: number]>([0, 0]);
   const boardRef = useRef<HTMLDivElement>(null);
+
+  const onContextMenu = (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent> | null,
+    cell: Cell,
+    cellIndex: number,
+    rowIndex: number,
+  ) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if ((cell.isClicked && !cell.isFlagged) || isGameOver) return;
+    setRemainingFlags((prev) => {
+      if (cell.isFlagged) {
+        // flag removed
+        return prev + 1;
+      }
+      // flag added
+      return prev - 1;
+    });
+    setRows((prev) => {
+      const copy = [...prev];
+      copy[rowIndex][cellIndex] = {
+        ...cell,
+        isFlagged: !cell.isFlagged,
+      };
+      return copy;
+    });
+  };
   return (
     <>
       <motion.div
@@ -66,6 +96,9 @@ export const Board = ({
                   height: gameHeight / settings.size[1],
                 }}
                 onClick={() => {
+                  if (clickIsFlag) {
+                    return onContextMenu(null, cell, cellIndex, rowIndex);
+                  }
                   if (cell.isClicked || cell.isFlagged || isGameOver) return;
                   setRows((prev) => {
                     let copy = [...prev];
@@ -86,26 +119,9 @@ export const Board = ({
                     return clickZeroCells(rowIndex, cellIndex, copy);
                   });
                 }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  if ((cell.isClicked && !cell.isFlagged) || isGameOver) return;
-                  setRemainingFlags((prev) => {
-                    if (cell.isFlagged) {
-                      // flag removed
-                      return prev + 1;
-                    }
-                    // flag added
-                    return prev - 1;
-                  });
-                  setRows((prev) => {
-                    const copy = [...prev];
-                    copy[rowIndex][cellIndex] = {
-                      ...cell,
-                      isFlagged: !cell.isFlagged,
-                    };
-                    return copy;
-                  });
-                }}
+                onContextMenu={(e) =>
+                  onContextMenu(e, cell, cellIndex, rowIndex)
+                }
               >
                 <AnimatePresence>
                   {cell.isFlagged && (
@@ -168,7 +184,25 @@ export const Board = ({
       >
         randomize
       </Button> */}
-      <ZoomSlider boardRef={boardRef} />
+      <div className="absolute bottom-10 left-1/2 flex w-full -translate-x-1/2 flex-col items-center justify-center">
+        <ZoomSlider boardRef={boardRef} />
+        <Tabs
+          className="z-50 pt-2"
+          value={clickIsFlag ? "flag" : "mine"}
+          onValueChange={(v) => {
+            setClickIsFlag(v === "flag");
+          }}
+        >
+          <TabsList className="bg-destructive">
+            <TabsTrigger value="mine">
+              <Shovel />
+            </TabsTrigger>
+            <TabsTrigger value="flag">
+              <Flag />
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
     </>
   );
 };

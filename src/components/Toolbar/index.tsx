@@ -54,7 +54,7 @@ export const Toolbar = ({
   useEffect(() => restart(), []);
 
   return (
-    <div className="z-50 flex items-center justify-center gap-3 py-3">
+    <div className="z-50 flex flex-wrap items-center justify-center gap-3 py-3">
       <span>
         <span className="text-muted-foreground">mode: </span>
         <span>{settingsChoices[selectedSettings]?.difficulty ?? "none"}</span>
