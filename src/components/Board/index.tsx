@@ -11,8 +11,14 @@ import { Two } from "../Numbers/Two";
 import { useRef, useState } from "react";
 import { Cell, gameHeight, gameWidth, Settings } from "@/App";
 import { ZoomSlider } from "../ZoomSlider";
-import { calculateNeighbors, clickZeroCells, scatterMines } from "@/lib/utils";
+import {
+  calculateNeighbors,
+  clickZeroCells,
+  getRandNotInArr,
+  scatterMines,
+} from "@/lib/utils";
 import { Button } from "../ui/button";
+import { Mine } from "../Mine";
 
 export const Board = ({
   rows,
@@ -126,7 +132,9 @@ export const Board = ({
                     className="pointer-events-none flex items-center justify-center"
                   >
                     {cell.isMine ? (
-                      <Bomb size={"80%"} className="text-destructive" />
+                      <div className="flex items-center justify-center bg-destructive">
+                        <Mine className="h-full w-full" />
+                      </div>
                     ) : cell.neighbors === 1 ? (
                       <One className="h-4/5 w-4/5" />
                     ) : cell.neighbors === 2 ? (
