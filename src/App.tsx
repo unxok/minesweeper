@@ -20,6 +20,14 @@ import {
 } from "./components/ui/card";
 import { ScrollArea } from "./components/ui/scroll-area";
 import { DimensionsIcon, DividerVerticalIcon } from "@radix-ui/react-icons";
+import { One } from "./components/Numbers/One";
+import { Two } from "./components/Numbers/Two";
+import { Three } from "./components/Numbers/Three";
+import { Four } from "./components/Numbers/Four";
+import { Five } from "./components/Numbers/Five";
+import { Six } from "./components/Numbers/Six";
+import { Seven } from "./components/Numbers/Seven";
+import { Eight } from "./components/Numbers/Eight";
 
 type Cell = {
   isMine: boolean;
@@ -294,16 +302,30 @@ function App() {
                 }}
               >
                 {cell.isFlagged && (
-                  <Flag size={"2rem"} className="text-destructive" />
+                  <Flag size={"80%"} className="text-destructive" />
                 )}
                 {cell.isClicked && (
-                  <span className="pointer-events-none">
+                  <span className="pointer-events-none flex items-center justify-center">
                     {cell.isMine ? (
-                      <Bomb size={"2rem"} className="text-destructive" />
+                      <Bomb size={"80%"} className="text-destructive" />
+                    ) : cell.neighbors === 1 ? (
+                      <One className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 2 ? (
+                      <Two className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 3 ? (
+                      <Three className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 4 ? (
+                      <Four className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 5 ? (
+                      <Five className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 6 ? (
+                      <Six className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 7 ? (
+                      <Seven className="h-4/5 w-4/5" />
+                    ) : cell.neighbors === 8 ? (
+                      <Eight className="h-4/5 w-4/5" />
                     ) : (
-                      <span className="text-xl font-bold">
-                        {cell.neighbors || ""}
-                      </span>
+                      ""
                     )}
                   </span>
                 )}
@@ -342,6 +364,8 @@ const settingsChoices: Settings[] = [
   { difficulty: "medium", size: [13, 15], mines: 40 },
   { difficulty: "medium+", size: [15, 15], mines: 40 },
   { difficulty: "medium++", size: [16, 16], mines: 40 },
+  { difficulty: "expert", size: [16, 30], mines: 99 },
+  { difficulty: "IMPOSSIBLE", size: [30, 30], mines: 200 },
 ];
 
 export const Toolbar = ({
