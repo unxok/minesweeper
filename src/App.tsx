@@ -7,7 +7,6 @@ import {
   scatterMines,
   initRows,
   registerHighScore,
-  scatterTraps,
 } from "./lib/utils";
 
 export type Cell = {
